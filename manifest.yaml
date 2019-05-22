@@ -12,8 +12,9 @@ spec:
     spec:
       containers:
       - name: node
-        image: node
-        command: ['node', '/usr/src/app/index.js']
+        image: docker.pkg.github.com/tcbyrd/node-k8s/node-k8s:0.0.1
         ports:
         - containerPort: 3000
           protocol: TCP
+      imagePullSecrets:
+      - name: regcred
