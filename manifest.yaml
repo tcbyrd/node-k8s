@@ -1,0 +1,19 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: node-example
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: node-example
+    spec:
+      containers:
+      - name: node
+        image: node
+        command: ['node', '/usr/src/app/index.js']
+        ports:
+        - containerPort: 3000
+          protocol: TCP
