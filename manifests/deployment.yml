@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: "tcbyrdk8sdev-ac89"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: "tcbyrdk8sdev-ac89"
+  template:
+    metadata:
+      labels:
+        app: "tcbyrdk8sdev-ac89"
+    spec:
+      containers:
+        - name: "tcbyrdk8sdev-ac89"
+          image: "tcbyrddevacr.azurecr.io/tcbyrdk8sdev"
+          ports:
+          - containerPort: 3000
