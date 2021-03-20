@@ -10,6 +10,16 @@ on:
   workflow_dispatch:
 
 jobs:
+  trigger-deployment:
+    runs-on: 'ubuntu-latest'
+    outputs:
+      deployment_id: ${{ steps.create_deployment.outputs.deployment_id }}
+    steps:
+      - name: Create Deployment
+        id: create_deployment
+        run: |
+          echo "::set-output name=deployment_id::$(gh api repos/tcbyrd/tcbyrd.dev/deployments -f ref=abcb18f2ac0f05983497294c7d21148a3d86144b -q .id)"
+
   build-and-deploy:
     runs-on: 'ubuntu-latest'
 
@@ -33,3 +43,26 @@ jobs:
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_6bf2406506304421801173ebf52af134 }}
         images: 'ghcr.io/${{ github.repository }}:${{ github.sha }}'
+
+  verify-deployment:
+    needs: [build-and-deploy, trigger-deployment]
+    runs-on:  'ubuntu-latest'
+    
+    steps:
+    - name: Wait for current version
+      run: |
+        response=$(curl -s https://getstartedapp059f5af2.azurewebsites.net/.github/version)
+
+        echo "Current version: '$response'"
+        while [ "$response" != '${{ github.sha }}' ]
+        do
+            response=$(curl -s https://getstartedapp059f5af2.azurewebsites.net/.github/version)
+            echo "response: '$response'"
+            sleep 1s
+        done
+
+        echo "deployment is done"
+      timeout-minutes: 1
+    - name: Update deployment environment
+      run: gh api repos/${{ github.respository }}/deployments/${{ needs.trigger-deployment.outputs.deployment_id }}/statuses -f state=success -f environment_url='https://getstartedapp059f5af2.azurewebsites.net/'
+    
