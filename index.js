@@ -1,5 +1,5 @@
 const http = require('http')
 
 http.createServer((req, res) => {
-  res.end('Test after moving to docker login.')
+  res.end('foo')
 }).listen(3000)
