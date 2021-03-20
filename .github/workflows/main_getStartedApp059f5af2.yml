@@ -16,15 +16,15 @@ jobs:
     steps:
     - uses: actions/checkout@master
 
-    - uses: azure/docker-login@v1
+    - uses: docker/login-action@v1
       with:
-        login-server: https://ghcr.io/
-        username: ${{ secrets.AzureAppService_ContainerUsername_4a7af9dd70804c089da6896ea1755b19 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_27da909936d449a58d9d16947e1b0ae8 }}
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     - run: |
-        docker build . -t ghcr.io/${{ secrets.AzureAppService_ContainerUsername_4a7af9dd70804c089da6896ea1755b19 }}/tcbyrd/node-k8s:${{ github.sha }}
-        docker push ghcr.io/${{ secrets.AzureAppService_ContainerUsername_4a7af9dd70804c089da6896ea1755b19 }}/tcbyrd/node-k8s:${{ github.sha }}
+        docker build . -t ghcr.io/${{ github.repository }}:${{ github.sha }}
+        docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
@@ -32,4 +32,4 @@ jobs:
         app-name: 'getStartedApp059f5af2'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_6bf2406506304421801173ebf52af134 }}
-        images: 'ghcr.io/${{ secrets.AzureAppService_ContainerUsername_4a7af9dd70804c089da6896ea1755b19 }}/tcbyrd/node-k8s:${{ github.sha }}'
+        images: 'ghcr.io/${{ github.repository }}:${{ github.sha }}'
