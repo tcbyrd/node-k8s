@@ -32,4 +32,4 @@ jobs:
         app-name: 'getStartedApp059f5af2'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_85e6306e443b493096c03d2202bb727b }}
-        images: 'docker.pkg.github.com/${{ secrets.AzureAppService_ContainerUsername_07657780175d49d5852a4bb9a1a27543 }}/node-k8s/node-k8s/:${{ github.sha }}'
+        images: 'docker.pkg.github.com/${{ secrets.AzureAppService_ContainerUsername_07657780175d49d5852a4bb9a1a27543 }}/node-k8s/node-k8s:${{ github.sha }}'
