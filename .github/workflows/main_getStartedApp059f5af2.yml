@@ -1,0 +1,35 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy container app to Azure Web App - getStartedApp059f5af2
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: 'ubuntu-latest'
+
+    steps:
+    - uses: actions/checkout@master
+
+    - uses: azure/docker-login@v1
+      with:
+        login-server: https://ghcr.io/
+        username: ${{ secrets.AzureAppService_ContainerUsername_4a7af9dd70804c089da6896ea1755b19 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_27da909936d449a58d9d16947e1b0ae8 }}
+
+    - run: |
+        docker build . -t ghcr.io/${{ secrets.AzureAppService_ContainerUsername_4a7af9dd70804c089da6896ea1755b19 }}/tcbyrd/node-k8s:${{ github.sha }}
+        docker push ghcr.io/${{ secrets.AzureAppService_ContainerUsername_4a7af9dd70804c089da6896ea1755b19 }}/tcbyrd/node-k8s:${{ github.sha }}
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'getStartedApp059f5af2'
+        slot-name: 'production'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_6bf2406506304421801173ebf52af134 }}
+        images: 'ghcr.io/${{ secrets.AzureAppService_ContainerUsername_4a7af9dd70804c089da6896ea1755b19 }}/tcbyrd/node-k8s:${{ github.sha }}'
