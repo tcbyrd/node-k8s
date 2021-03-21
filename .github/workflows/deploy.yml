@@ -15,12 +15,12 @@ jobs:
     outputs:
       deployment_id: ${{ steps.create_deployment.outputs.deployment_id }}
     steps:
-      - name: Create Deployment
+      - name: Create a Deployment
         id: create_deployment
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          deploymentID=$(gh api repos/${{ github.repository }}/deployments -f ref=${{ github.sha }} -q .id)
+          deploymentID=$(gh api repos/${{ github.repository }}/deployments -f ref=${{ github.sha }} -f environment=${{ github.event.inputs.environment }} -q .id)
           echo "::set-output name=deployment_id::$deploymentID"
           gh api repos/${{ github.repository }}/deployments/$deploymentID/statuses -f state=pending -f target_url=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
   deploy:
