@@ -4,5 +4,5 @@ http.createServer((req, res) => {
   if (req.url === '/.github/version') {
     return res.end(process.env.GITHUB_SHA);
   }
-  res.end('Testing a PR')
+  res.end('Testing the GitHub flow!')
 }).listen(3000)
