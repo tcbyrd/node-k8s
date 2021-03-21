@@ -15,6 +15,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "::set-output name=deployment_id::$(gh api repos/${{ github.repository }}/deployments -f ref=${{ github.sha }} -q .id)"
+          gh api repos${{ github.repository }}/deployments/${{ steps.create_deployment.outputs.deployment_id}}/statuses \
+          -f state=pending log_url=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
   deploy:
     needs: [trigger-deployment]
     runs-on: 'ubuntu-latest'
