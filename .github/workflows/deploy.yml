@@ -39,7 +39,7 @@ jobs:
       if: ${{ github.event.inputs.environment == 'staging' }}
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'getStartedApp059f5af2'
+        app-name: 'getStartedApp059f5af2-staging'
         slot-name: 'staging'
         publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_STAGING }}
         images: 'ghcr.io/${{ github.repository }}:${{ github.sha }}'
