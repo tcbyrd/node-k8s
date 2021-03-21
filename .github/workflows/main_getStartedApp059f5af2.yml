@@ -10,19 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  trigger-deployment:
-    runs-on: 'ubuntu-latest'
-    outputs:
-      deployment_id: ${{ steps.create_deployment.outputs.deployment_id }}
-    steps:
-      - name: Create Deployment
-        id: create_deployment
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "::set-output name=deployment_id::$(gh api repos/${{ github.repository }}/deployments -f ref=${{ github.sha }} -q .id)"
-
-  build-and-deploy:
+  build:
     runs-on: 'ubuntu-latest'
 
     steps:
@@ -38,6 +26,22 @@ jobs:
         docker build . -t ghcr.io/${{ github.repository }}:${{ github.sha }} --build-arg GITHUB_SHA=${{ github.sha }}
         docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
 
+  trigger-deployment:
+    needs: [build]
+    runs-on: 'ubuntu-latest'
+    outputs:
+      deployment_id: ${{ steps.create_deployment.outputs.deployment_id }}
+    steps:
+      - name: Create Deployment
+        id: create_deployment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::set-output name=deployment_id::$(gh api repos/${{ github.repository }}/deployments -f ref=${{ github.sha }} -q .id)"
+  deploy:
+    needs: [trigger-deployment]
+    runs-on: 'ubuntu-latest'
+    steps:
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
@@ -47,13 +51,11 @@ jobs:
         images: 'ghcr.io/${{ github.repository }}:${{ github.sha }}'
 
   verify-deployment:
-    needs: [build-and-deploy, trigger-deployment]
+    needs: [build, deploy, trigger-deployment]
     runs-on:  'ubuntu-latest'
     
     steps:
     - name: Wait for current version
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         response=$(curl -s https://getstartedapp059f5af2.azurewebsites.net/.github/version)
 
@@ -68,5 +70,7 @@ jobs:
         echo "deployment is done"
       timeout-minutes: 1
     - name: Update deployment environment
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: gh api repos/${{ github.respository }}/deployments/${{ needs.trigger-deployment.outputs.deployment_id }}/statuses -f state=success -f environment_url='https://getstartedapp059f5af2.azurewebsites.net/'
     
