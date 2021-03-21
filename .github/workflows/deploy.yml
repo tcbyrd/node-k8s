@@ -15,12 +15,12 @@ jobs:
     outputs:
       deployment_id: ${{ steps.create_deployment.outputs.deployment_id }}
     steps:
-      - name: Create Deployment
+      - name: Create a Deployment
         id: create_deployment
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          deploymentID=$(gh api repos/${{ github.repository }}/deployments -f ref=${{ github.sha }} -q .id)
+          deploymentID=$(gh api repos/${{ github.repository }}/deployments -f ref=${{ github.sha }} -f environment=${{ github.event.inputs.environment }} -q .id)
           echo "::set-output name=deployment_id::$deploymentID"
           gh api repos/${{ github.repository }}/deployments/$deploymentID/statuses -f state=pending -f target_url=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
   deploy:
@@ -49,7 +49,8 @@ jobs:
     runs-on:  'ubuntu-latest'
     
     steps:
-    - name: Wait for current version
+    - name: Check Production
+      if: ${{ github.event.inputs.environment == 'production' }}
       run: |
         response=$(curl -s https://getstartedapp059f5af2.azurewebsites.net/.github/version)
 
@@ -62,6 +63,21 @@ jobs:
         done
 
         echo "deployment is done"
+      timeout-minutes: 1
+    - name: Check Staging
+      if: ${{ github.event.inputs.environment == 'staging' }}
+      run: |
+        response=$(curl -s https://getstartedapp059f5af2-staging.azurewebsites.net/.github/version)
+
+        echo "Current version: '$response'"
+        while [ "$response" != '${{ github.sha }}' ]
+        do
+            response=$(curl -s https://getstartedapp059f5af2-staging.azurewebsites.net/.github/version)
+            echo "response: '$response'"
+            sleep 1s
+        done
+
+        echo "deployment to staging is done"
       timeout-minutes: 1
     - name: Update deployment environment
       env:
