@@ -21,7 +21,16 @@ jobs:
         registry: ghcr.io
         username: ${{ github.repository_owner }}
         password: ${{ secrets.AZUREAPPSERVICE_CONTAINERPASSWORD_75A57EBDB84947A09A48290C6E2122C2 }}
+    - name: Build and Push a PR
+      if: github.event_name == 'pull_request'
+      run: |
+        docker build . -t ghcr.io/${{ github.repository }}:${{ github.event.pull_request.head.sha }} --build-arg GITHUB_SHA=${{ github.event.pull_request.head.sha }}
+        docker push ghcr.io/${{ github.repository }}:${{ github.event.pull_request.head.sha }}
+    - name: Build and Push from workflow dispatch
+      if: github.event_name == 'workflow_dispatch'
+      run: |
+        docker build . -t ghcr.io/${{ github.repository }}:${{ github.sha }} --build-arg GITHUB_SHA=${{ github.sha }}
+        docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
+      
 
-    - run: |
-        docker build . -t ghcr.io/${{ github.repository }}:$GITHUB_SHA --build-arg GITHUB_SHA=$GITHUB_SHA
-        docker push ghcr.io/${{ github.repository }}:$GITHUB_SHA
+      
