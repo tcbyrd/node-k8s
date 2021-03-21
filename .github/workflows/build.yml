@@ -23,5 +23,5 @@ jobs:
         password: ${{ secrets.AZUREAPPSERVICE_CONTAINERPASSWORD_75A57EBDB84947A09A48290C6E2122C2 }}
 
     - run: |
-        docker build . -t ghcr.io/${{ github.repository }}:${{ github.sha }} --build-arg GITHUB_SHA=${{ github.sha }}
-        docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
+        docker build . -t ghcr.io/${{ github.repository }}:$GITHUB_SHA --build-arg GITHUB_SHA=$GITHUB_SHA
+        docker push ghcr.io/${{ github.repository }}:$GITHUB_SHA
