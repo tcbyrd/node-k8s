@@ -6,8 +6,9 @@ WORKDIR /usr/src/app
 
 ADD index.js ./
 
-# GITHUB_SHA gets set as environmetn variable during build
-ENV GITHUB_SHA=${GITHUB_SHA}
+# GITHUB_SHA gets set as environment variable during build
+ARG GITHUB_SHA
+ENV GITHUB_SHA=$GITHUB_SHA
 
 EXPOSE 3000
 
