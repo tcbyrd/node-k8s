@@ -20,7 +20,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "::set-output name=deployment_id::$(gh api repos/tcbyrd/tcbyrd.dev/deployments -f ref=abcb18f2ac0f05983497294c7d21148a3d86144b -q .id)"
+          echo "::set-output name=deployment_id::$(gh api repos/${{ github.repository }}/deployments -f ref=${{ github.sha }} -q .id)"
 
   build-and-deploy:
     runs-on: 'ubuntu-latest'
