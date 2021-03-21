@@ -2,6 +2,12 @@ name: Deploy to Web App
 
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to Deploy to'
+        required: true
+        default: 'production'
+  
 
 jobs:
   trigger-deployment:
@@ -25,7 +31,7 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'getStartedApp059f5af2'
-        slot-name: 'production'
+        slot-name: ${{ github.event.inputs.environment }}
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_6bf2406506304421801173ebf52af134 }}
         images: 'ghcr.io/${{ github.repository }}:${{ github.sha }}'
 
