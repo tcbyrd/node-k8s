@@ -35,7 +35,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - run: |
-        docker build . -t ghcr.io/${{ github.repository }}:${{ github.sha }} --build-args GITHUB_SHA=${{ github.sha }}
+        docker build . -t ghcr.io/${{ github.repository }}:${{ github.sha }} --build-arg GITHUB_SHA=${{ github.sha }}
         docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
 
     - name: Deploy to Azure Web App
