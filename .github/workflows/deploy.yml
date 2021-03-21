@@ -27,12 +27,21 @@ jobs:
     needs: [trigger-deployment]
     runs-on: 'ubuntu-latest'
     steps:
-    - name: Deploy to Azure Web App
+    - name: Deploy to production
+      if: ${{ github.event.inputs.environment == 'production' }}
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'getStartedApp059f5af2'
-        slot-name: ${{ github.event.inputs.environment }}
+        slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_6bf2406506304421801173ebf52af134 }}
+        images: 'ghcr.io/${{ github.repository }}:${{ github.sha }}'
+    - name: Deploy to staging
+      if: ${{ github.event.inputs.environment == 'staging' }}
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'getStartedApp059f5af2'
+        slot-name: 'staging'
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_STAGING }}
         images: 'ghcr.io/${{ github.repository }}:${{ github.sha }}'
 
   verify-deployment:
