@@ -1,7 +1,7 @@
 const http = require('http')
 
 http.createServer((req, res) => {
-  if (req.path === '/.github/version') {
+  if (req.url === '/.github/version') {
     return res.end(process.env.GITHUB_SHA);
   }
   res.end('foo')
