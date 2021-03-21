@@ -49,5 +49,5 @@ jobs:
     - name: Update deployment environment
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: gh api repos/${{ github.respository }}/deployments/${{ needs.trigger-deployment.outputs.deployment_id }}/statuses -f state=success -f environment_url='https://getstartedapp059f5af2.azurewebsites.net/'
+      run: gh api repos/${{ github.repository }}/deployments/${{ needs.trigger-deployment.outputs.deployment_id }}/statuses -f state=success -f environment_url='https://getstartedapp059f5af2.azurewebsites.net/'
     
