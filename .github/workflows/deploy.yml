@@ -1,4 +1,4 @@
-name: Build container
+name: Deploy to Web App
 
 on:
   workflow_dispatch:
@@ -28,7 +28,7 @@ jobs:
         images: 'ghcr.io/${{ github.repository }}:${{ github.sha }}'
 
   verify-deployment:
-    needs: [build, deploy, trigger-deployment]
+    needs: [deploy, trigger-deployment]
     runs-on:  'ubuntu-latest'
     
     steps:
